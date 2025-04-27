@@ -38,6 +38,8 @@ export default function ProfilePage() {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
+  const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
   useEffect(() => {
     // Fetch the current user
@@ -98,16 +100,13 @@ export default function ProfilePage() {
       console.log("Updated User Payload:", updatedUser); // Debugging log
 
       // Send updated data to the backend
-      const response = await fetch(
-        `http://localhost:8080/usuarios/${user?.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedUser),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/usuarios/${user?.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedUser),
+      });
 
       const result = await response.json();
 

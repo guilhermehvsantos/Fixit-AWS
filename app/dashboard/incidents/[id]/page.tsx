@@ -146,7 +146,7 @@ export default function IncidentDetailsPage() {
         }),
       });
 
-      if (updatedIncident) {
+      if (updatedIncident !== undefined) {
         setIncident(updatedIncident);
         setSuccessMessage("Chamado marcado como solucionado");
         setShowSuccessAlert(true);
@@ -302,7 +302,7 @@ export default function IncidentDetailsPage() {
         status: "em_andamento",
       });
 
-      if (updatedIncident) {
+      if (updatedIncident !== undefined) {
         setIncident(updatedIncident);
         setSuccessMessage("Incident successfully assigned to you");
         setShowSuccessAlert(true);
@@ -334,7 +334,7 @@ export default function IncidentDetailsPage() {
         createdAt: new Date().toISOString(),
       });
 
-      if (updatedIncident) {
+      if (updatedIncident !== undefined) {
         setIncident(updatedIncident);
         setComment("");
         setSuccessMessage("Comentário adicionado com sucesso");
@@ -378,7 +378,7 @@ export default function IncidentDetailsPage() {
           <div className="flex gap-2">
             {canSolve &&
               (incident.status === "em_atendimento" ||
-                incident.tecnico?.name === currentUser?.name ) && (
+                incident.tecnico?.name === currentUser?.name) && (
                 <Dialog
                   open={confirmSolveOpen}
                   onOpenChange={setConfirmSolveOpen}
@@ -500,25 +500,23 @@ export default function IncidentDetailsPage() {
             </CardContent>
           </Card>
 
-            {/* Status Information */}
-            <Card>
+          {/* Status Information */}
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-              <CardTitle>Status do Chamado</CardTitle>
-              <span
-
-              >
-                {incident.tecnico?.name === undefined ? (
-                <StatusLabel status={incident.status} />
-                ) : incident.tecnico ? (
-                <StatusLabel status={incident.status} />
-                ) : (
-                "Status do técnico desconhecido."
-                )}
-              </span>
+                <CardTitle>Status do Chamado</CardTitle>
+                <span>
+                  {incident.tecnico?.name === undefined ? (
+                    <StatusLabel status={incident.status} />
+                  ) : incident.tecnico ? (
+                    <StatusLabel status={incident.status} />
+                  ) : (
+                    "Status do técnico desconhecido."
+                  )}
+                </span>
               </div>
             </CardHeader>
-            </Card>
+          </Card>
 
           {/*.comentarios Section */}
           <Card>
@@ -654,86 +652,90 @@ export default function IncidentDetailsPage() {
                 )}
 
                 {/* Assignment options */}
-                {canAssign && !incident.tecnico && incident.status.toLowerCase() !== "solucionado" && (
-                  <div className="mt-2 flex flex-col gap-2">
-                    {isAdmin ? (
-                      <Dialog
-                        open={assignDialogOpen}
-                        onOpenChange={setAssignDialogOpen}
-                      >
-                        <DialogTrigger asChild>
-                          <Button
-                            size="sm"
-                            className="w-full bg-navy-600 hover:bg-navy-700 text-white"
-                          >
-                            <UserPlus className="mr-2 h-4 w-4" />
-                            Atribuir Técnico
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Atribuir Técnico</DialogTitle>
-                            <DialogDescription>
-                              Selecione um técnico para atribuir a este chamado
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="py-4">
-                            {technicians.length > 0 ? (
-                              <Select
-                                value={selectedTechnician}
-                                onValueChange={setSelectedTechnician}
+                {canAssign &&
+                  !incident.tecnico &&
+                  incident.status.toLowerCase() !== "solucionado" && (
+                    <div className="mt-2 flex flex-col gap-2">
+                      {isAdmin ? (
+                        <Dialog
+                          open={assignDialogOpen}
+                          onOpenChange={setAssignDialogOpen}
+                        >
+                          <DialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              className="w-full bg-navy-600 hover:bg-navy-700 text-white"
+                            >
+                              <UserPlus className="mr-2 h-4 w-4" />
+                              Atribuir Técnico
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Atribuir Técnico</DialogTitle>
+                              <DialogDescription>
+                                Selecione um técnico para atribuir a este
+                                chamado
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="py-4">
+                              {technicians.length > 0 ? (
+                                <Select
+                                  value={selectedTechnician}
+                                  onValueChange={setSelectedTechnician}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Selecione um técnico" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {technicians.map((tech) => (
+                                      <SelectItem key={tech.id} value={tech.id}>
+                                        {tech.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <div className="text-center py-2 text-slate-500">
+                                  Não foi possível carregar a lista de técnicos.
+                                  Por favor, tente novamente mais tarde.
+                                </div>
+                              )}
+                            </div>
+                            <DialogFooter>
+                              <Button
+                                variant="outline"
+                                onClick={() => setAssignDialogOpen(false)}
                               >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecione um técnico" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {technicians.map((tech) => (
-                                    <SelectItem key={tech.id} value={tech.id}>
-                                      {tech.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            ) : (
-                              <div className="text-center py-2 text-slate-500">
-                                Não foi possível carregar a lista de técnicos.
-                                Por favor, tente novamente mais tarde.
-                              </div>
-                            )}
-                          </div>
-                          <DialogFooter>
-                            <Button
-                              variant="outline"
-                              onClick={() => setAssignDialogOpen(false)}
-                            >
-                              Cancelar
-                            </Button>
-                            <Button
-                              className="bg-navy-600 hover:bg-navy-700 text-white"
-                              onClick={() =>
-                                handleAssignTechnician(selectedTechnician)
-                              }
-                              disabled={
-                                !selectedTechnician || technicians.length === 0
-                              }
-                            >
-                              Atribuir
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    ) : (
-                      <Button
-                        size="sm"
-                        className="w-full bg-navy-600 hover:bg-navy-700 text-white"
-                        onClick={handleSelfAssign}
-                      >
-                        <UserPlus className="mr-2 h-4 w-4" />
-                        Atribuir a mim
-                      </Button>
-                    )}
-                  </div>
-                )}
+                                Cancelar
+                              </Button>
+                              <Button
+                                className="bg-navy-600 hover:bg-navy-700 text-white"
+                                onClick={() =>
+                                  handleAssignTechnician(selectedTechnician)
+                                }
+                                disabled={
+                                  !selectedTechnician ||
+                                  technicians.length === 0
+                                }
+                              >
+                                Atribuir
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      ) : (
+                        <Button
+                          size="sm"
+                          className="w-full bg-navy-600 hover:bg-navy-700 text-white"
+                          onClick={handleSelfAssign}
+                        >
+                          <UserPlus className="mr-2 h-4 w-4" />
+                          Atribuir a mim
+                        </Button>
+                      )}
+                    </div>
+                  )}
               </div>
 
               <Separator />
@@ -777,4 +779,14 @@ export default function IncidentDetailsPage() {
       </div>
     </>
   );
+}
+function addCommentToIncident(
+  id: string,
+  arg1: {
+    text: string;
+    createdBy: { id: string; name: string };
+    createdAt: string;
+  }
+) {
+  throw new Error("Function not implemented.");
 }

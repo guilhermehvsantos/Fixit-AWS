@@ -30,6 +30,9 @@ export interface Incident {
   };
 }
 
+// Base URL for the API
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+
 // Map priority to backend format
 export function mapPriorityToBackend(priority: string): string {
   switch (priority) {
@@ -48,7 +51,7 @@ export function mapPriorityToBackend(priority: string): string {
 
 // Get all incidents
 export async function getAllIncidents(): Promise<Incident[]> {
-  const response = await fetch("http://localhost:8080/chamados", {
+  const response = await fetch(`${API_BASE_URL}/chamados`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -64,18 +67,18 @@ export async function getAllIncidents(): Promise<Incident[]> {
 
 // Get incident by ID
 export async function getIncidentById(id: string | number) {
-  const response = await fetch(`http://localhost:8080/chamados/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/chamados/${id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-  })
+  });
 
   if (!response.ok) {
-    throw new Error("Failed to fetch incident")
+    throw new Error("Failed to fetch incident");
   }
 
-  return response.json()
+  return response.json();
 }
 
 // Create a new incident
@@ -86,7 +89,7 @@ export async function createIncident(data: {
   priority: "low" | "medium" | "high" | "critical";
   userId: number;
 }) {
-  const response = await fetch("http://localhost:8080/chamados", {
+  const response = await fetch(`${API_BASE_URL}/chamados`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -109,7 +112,7 @@ export async function createIncident(data: {
 
 // Update an incident
 export async function updateIncident(id: string, updates: Partial<Incident>) {
-  const response = await fetch(`http://localhost:8080/chamados/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/chamados/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -117,47 +120,47 @@ export async function updateIncident(id: string, updates: Partial<Incident>) {
     body: JSON.stringify({
       ...updates,
     }),
-  })
+  });
 
   if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.message || "Failed to update the incident")
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to update the incident");
   }
 
-  return response.json()
+  return response.json();
 }
 
 // Delete an incident
 export async function deleteIncident(id: string) {
-  const response = await fetch(`http://localhost:8080/chamados/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/chamados/${id}`, {
     method: "DELETE",
-  })
+  });
 
   if (!response.ok) {
-    throw new Error("Failed to delete the incident")
+    throw new Error("Failed to delete the incident");
   }
 
-  return true
+  return true;
 }
 
 // Search incidents
 export async function searchIncidents(query: string) {
-  const response = await fetch(`http://localhost:8080/chamados/buscar?q=${encodeURIComponent(query)}`, {
+  const response = await fetch(`${API_BASE_URL}/chamados/buscar?q=${encodeURIComponent(query)}`, {
     method: "GET",
-  })
+  });
 
   if (!response.ok) {
-    throw new Error("Failed to search incidents")
+    throw new Error("Failed to search incidents");
   }
 
-  return response.json()
+  return response.json();
 }
 
 // Filter incidents
 export async function filterIncidents(filters: {
-  status?: string
-  priority?: "low" | "medium" | "high" | "critical"
-  department?: string
+  status?: string;
+  priority?: "low" | "medium" | "high" | "critical";
+  department?: string;
 }) {
   const queryParams = new URLSearchParams(
     Object.entries({
@@ -165,18 +168,18 @@ export async function filterIncidents(filters: {
       prioridade: filters.priority ? mapPriorityToBackend(filters.priority) : undefined,
       departamento: filters.department,
     }).reduce((acc, [key, value]) => {
-      if (value !== undefined) acc[key] = value
-      return acc
+      if (value !== undefined) acc[key] = value;
+      return acc;
     }, {} as Record<string, string>)
-  ).toString()
+  ).toString();
 
-  const response = await fetch(`http://localhost:8080/chamados/filtrar?${queryParams}`, {
+  const response = await fetch(`${API_BASE_URL}/chamados/filtrar?${queryParams}`, {
     method: "GET",
-  })
+  });
 
   if (!response.ok) {
-    throw new Error("Failed to filter incidents")
+    throw new Error("Failed to filter incidents");
   }
 
-  return response.json()
+  return response.json();
 }

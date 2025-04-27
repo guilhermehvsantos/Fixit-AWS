@@ -89,17 +89,17 @@ export function initializeDefaultUsers(): void {
   }
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"
+
 // Registrar novo usuário via backend
 export async function registerUser(userData: Omit<User, "id" | "createdAt">): Promise<User> {
   try {
-    // Make sure the user has a role (default to "user" if not specified)
     const userDataWithRole = {
       ...userData,
       role: userData.role || "user",
     }
 
-    // Send the user data to the backend
-    const response = await fetch("http://localhost:8080/usuarios", {
+    const response = await fetch(`${API_BASE_URL}/usuarios`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -112,16 +112,10 @@ export async function registerUser(userData: Omit<User, "id" | "createdAt">): Pr
       throw new Error(errorData.message || "Erro ao registrar usuário")
     }
 
-    // Parse the response from the backend
     const newUser = await response.json()
-
-    // Store the full user object in localStorage
     localStorage.setItem("fixit_current_user", JSON.stringify(newUser))
-
-    // Store only the user ID in a separate key
     localStorage.setItem("fixit_user_id", newUser.id)
 
-    // Return user without password for security
     const { password, ...userWithoutPassword } = newUser
     return userWithoutPassword as User
   } catch (err: any) {
@@ -133,16 +127,10 @@ export async function registerUser(userData: Omit<User, "id" | "createdAt">): Pr
 // New login function that uses the backend's login endpoint
 export async function login(email: string, password: string) {
   try {
-    // Properly trim both email and password to remove any whitespace or tab characters
     const cleanEmail = email.trim()
     const cleanPassword = password.trim()
 
-    console.log("Attempting login with:", {
-      email: cleanEmail,
-      password: cleanPassword.replace(/./g, "*"), // Log masked password for debugging
-    })
-
-    const response = await fetch("http://localhost:8080/usuarios/login", {
+    const response = await fetch(`${API_BASE_URL}/usuarios/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -156,14 +144,8 @@ export async function login(email: string, password: string) {
     }
 
     const usuario = await response.json()
-
-    // Store the full user object in localStorage
     localStorage.setItem("fixit_current_user", JSON.stringify(usuario))
-
-    // Store only the user ID in a separate key
     localStorage.setItem("fixit_user_id", usuario.id)
-
-    console.log("Logged-in user ID:", usuario.id)
 
     return usuario
   } catch (error) {
@@ -200,7 +182,7 @@ export async function loginUser(email: string, password: string): Promise<Omit<U
       console.error("Backend login failed:", loginError)
 
       // If backend login fails, try the old way as fallback
-      const response = await fetch("http://localhost:8080/usuarios")
+      const response = await fetch(`${API_BASE_URL}/usuarios`)
       if (!response.ok) throw new Error("Erro ao buscar usuários")
 
       const users: User[] = await response.json()
@@ -269,7 +251,7 @@ export async function getUsers(): Promise<User[]> {
     const localUsers = getLocalUsers()
 
     // Then get backend users
-    const response = await fetch("http://localhost:8080/usuarios")
+    const response = await fetch(`${API_BASE_URL}/usuarios`)
     if (!response.ok) {
       console.error("Failed to fetch users from backend, using only local users")
       return localUsers
@@ -314,7 +296,7 @@ export async function createIncident(data: {
     throw new Error("User is not logged in")
   }
 
-  const response = await fetch("http://localhost:8080/chamados", {
+  const response = await fetch(`${API_BASE_URL}/chamados`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

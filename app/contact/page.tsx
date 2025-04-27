@@ -8,6 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+
 export default function ContatoSuporte() {
   const [form, setForm] = useState({
     nome: "",
@@ -25,7 +28,7 @@ export default function ContatoSuporte() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/contato", {
+      const response = await fetch(`${API_BASE_URL}/contato`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
