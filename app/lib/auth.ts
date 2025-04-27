@@ -89,7 +89,7 @@ export function initializeDefaultUsers(): void {
   }
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL 
 
 // Registrar novo usuário via backend
 export async function registerUser(userData: Omit<User, "id" | "createdAt">): Promise<User> {
